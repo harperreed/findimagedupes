@@ -167,6 +167,7 @@ func main() {
 				h2 := hashes[j]
 
 				d := perceptive.HammingDistance(h1, h2)
+
 				if d <= *threshold {
 					hmap[h1] = append(hmap[h1], hmap[h2]...)
 					delete(hmap, h2)

@@ -23,8 +23,7 @@ import (
 	"time"
 
 	_ "github.com/mattn/go-sqlite3"
-
-	"github.com/opennota/phash"
+	"github.com/umahmood/perceptive"
 )
 
 type entry struct {
@@ -128,7 +127,9 @@ func Cleanup() {
 		lastmod := iso8601(tm)
 		newlastmod := iso8601(fi.ModTime())
 		if lastmod != newlastmod {
-			newfp, err := phash.ImageHashDCT(path)
+
+			img := openImage(path)
+			newfp, err := perceptive.Dhash(img)
 			if err != nil {
 				continue
 			}
