@@ -17,15 +17,16 @@ package main
 import (
 	"flag"
 	"fmt"
+	"image"
 	"log"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"strings"
 
+	"github.com/disintegration/imaging"
 	"github.com/rakyll/magicmime"
-
-	"github.com/opennota/phash"
+	"github.com/umahmood/perceptive"
 )
 
 var (
@@ -47,6 +48,14 @@ func init() {
 		log.Fatal(err)
 	}
 
+}
+
+func openImage(filePath string) image.Image {
+	img, err := imaging.Open(filePath)
+	if err != nil {
+		log.Fatalln(err)
+	}
+	return img
 }
 
 // ProcessFile computes a fingerprint of the file if it is an image file,
@@ -88,7 +97,8 @@ func ProcessFile(path string, info os.FileInfo, err error) error {
 			spinner.Spin(path)
 		}
 
-		fp, err = phash.ImageHashDCT(path)
+		img := openImage(path)
+		fp, err := perceptive.Dhash(img)
 		if err != nil {
 			if !*quiet {
 				log.Printf("WARNING: %s: %v", path, err)
@@ -156,7 +166,7 @@ func main() {
 				h1 := hashes[i]
 				h2 := hashes[j]
 
-				d := phash.HammingDistance(h1, h2)
+				d := perceptive.HammingDistance(h1, h2)
 				if d <= *threshold {
 					hmap[h1] = append(hmap[h1], hmap[h2]...)
 					delete(hmap, h2)
